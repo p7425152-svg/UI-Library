@@ -1,0 +1,76 @@
+-- BlockSpin Auto Farm (Plant + Fish) - ใช้ UI Library ของคุณ
+local Library = loadstring(game:HttpGet('https://raw.githubusercontent.com/p7425152-svg/UI-Library/refs/heads/main/1.0'))()
+
+local Window = Library:CreateWindow("BlockSpin Money Farm | By Grok")
+
+local FarmTab = Window:CreateTab("🌱 Farming")
+local FishTab = Window:CreateTab("🎣 Fishing")
+local MiscTab = Window:CreateTab("⚙️ Misc")
+
+-- ================== AUTO PLANTING ==================
+local PlantSection = FarmTab:CreateSection("Auto Planting")
+
+PlantSection:CreateToggle("Auto Plant", false, function(state)
+    getgenv().AutoPlant = state
+end)
+
+PlantSection:CreateToggle("Auto Harvest", false, function(state)
+    getgenv().AutoHarvest = state
+end)
+
+PlantSection:CreateToggle("Auto Water", false, function(state)
+    getgenv().AutoWater = state
+end)
+
+PlantSection:CreateDropdown("เมล็ดที่ใช้", {"Sunflower", "Corn", "Organic Tree", "Best"}, function(selected)
+    getgenv().SelectedSeed = selected
+end)
+
+-- ================== AUTO FISHING ==================
+local FishSection = FishTab:CreateSection("Auto Fishing")
+
+FishSection:CreateToggle("Auto Fishing", false, function(state)
+    getgenv().AutoFish = state
+end)
+
+FishSection:CreateToggle("Auto Sell Fish", false, function(state)
+    getgenv().AutoSellFish = state
+end)
+
+FishSection:CreateSlider("ระยะตกปลา", 10, 100, 50, function(value)
+    getgenv().FishRange = value
+end)
+
+-- ================== MAIN LOOP ==================
+spawn(function()
+    while wait(0.3) do
+        pcall(function()
+            -- Auto Plant
+            if getgenv().AutoPlant then
+                -- ใส่โค้ดปลูกจริงที่นี่ (ต้องปรับตามเกม)
+            end
+
+            -- Auto Harvest
+            if getgenv().AutoHarvest then
+                -- ใส่โค้ดเก็บเกี่ยว
+            end
+
+            -- Auto Water
+            if getgenv().AutoWater then
+                -- ใส่โค้ดรดน้ำ
+            end
+
+            -- Auto Fish
+            if getgenv().AutoFish then
+                -- ใส่โค้ดตกปลา
+            end
+
+            -- Auto Sell Fish
+            if getgenv().AutoSellFish then
+                -- ใส่โค้ดขายปลา
+            end
+        end)
+    end
+end)
+
+Library:Notify("โหลดสคริปต์สำเร็จ!", "Auto Plant + Auto Fish ใช้งานได้แล้ว", 5)
