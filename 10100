@@ -1,0 +1,175 @@
+-- Block Spin Auto Farm + GUI เปิดปิด (อัพเดทล่าสุด)
+
+local player = game.Players.LocalPlayer
+local rs = game:GetService("ReplicatedStorage")
+
+-- ตั้งค่าเริ่มต้น
+_G.AutoFarm = false
+_G.AutoATM = true
+_G.AutoPlant = true
+_G.AutoHarvest = true
+_G.AutoDeposit = true
+_G.DepositAt = 15000
+
+-- ================== สร้าง GUI ==================
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "BlockSpinFarm"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = player:WaitForChild("PlayerGui")
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 360, 0, 480)
+MainFrame.Position = UDim2.new(0.5, -180, 0.5, -240)
+MainFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+MainFrame.BorderSizePixel = 0
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, 60)
+Title.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+Title.Text = "🌀 BLOCK SPIN AUTO FARM"
+Title.TextColor3 = Color3.fromRGB(0, 255, 140)
+Title.TextScaled = true
+Title.Font = Enum.Font.GothamBold
+Title.Parent = MainFrame
+
+-- Status
+local Status = Instance.new("TextLabel")
+Status.Size = UDim2.new(0.9, 0, 0, 45)
+Status.Position = UDim2.new(0.05, 0, 0, 70)
+Status.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
+Status.Text = "สถานะ: ปิด"
+Status.TextColor3 = Color3.new(1,1,1)
+Status.TextScaled = true
+Status.Font = Enum.Font.GothamBold
+Status.Parent = MainFrame
+
+-- ฟังก์ชันสร้าง Toggle
+local function CreateToggle(text, yPos, toggleName)
+    local Btn = Instance.new("TextButton")
+    Btn.Size = UDim2.new(0.9, 0, 0, 50)
+    Btn.Position = UDim2.new(0.05, 0, 0, yPos)
+    Btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    Btn.Text = text .. ": ON"
+    Btn.TextColor3 = Color3.new(1,1,1)
+    Btn.TextScaled = true
+    Btn.Font = Enum.Font.GothamSemibold
+    Btn.Parent = MainFrame
+
+    Btn.MouseButton1Click:Connect(function()
+        _G[toggleName] = not _G[toggleName]
+        Btn.Text = text .. (_G[toggleName] and ": ON" or ": OFF")
+        Btn.BackgroundColor3 = _G[toggleName] and Color3.fromRGB(0, 170, 0) or Color3.fromRGB(170, 0, 0)
+    end)
+end
+
+-- สร้างปุ่มต่าง ๆ
+CreateToggle("Auto ATM", 130, "AutoATM")
+CreateToggle("Auto Plant", 190, "AutoPlant")
+CreateToggle("Auto Harvest", 250, "AutoHarvest")
+CreateToggle("Auto Deposit", 310, "AutoDeposit")
+
+-- ปุ่มเปิด-ปิดหลัก
+local MainToggle = Instance.new("TextButton")
+MainToggle.Size = UDim2.new(0.9, 0, 0, 55)
+MainToggle.Position = UDim2.new(0.05, 0, 0, 375)
+MainToggle.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
+MainToggle.Text = "เปิด Auto Farm"
+MainToggle.TextColor3 = Color3.new(1,1,1)
+MainToggle.TextScaled = true
+MainToggle.Font = Enum.Font.GothamBold
+MainToggle.Parent = MainFrame
+
+MainToggle.MouseButton1Click:Connect(function()
+    _G.AutoFarm = not _G.AutoFarm
+    
+    if _G.AutoFarm then
+        MainToggle.Text = "ปิด Auto Farm"
+        MainToggle.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
+        Status.Text = "สถานะ: กำลังทำงาน ✅"
+        Status.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
+    else
+        MainToggle.Text = "เปิด Auto Farm"
+        MainToggle.BackgroundColor3 = Color3.fromRGB(0, 170, 0)
+        Status.Text = "สถานะ: ปิด"
+        Status.BackgroundColor3 = Color3.fromRGB(170, 0, 0)
+    end
+end)
+
+-- ปุ่มปิด GUI
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0.9, 0, 0, 40)
+CloseBtn.Position = UDim2.new(0.05, 0, 0, 435)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(100, 0, 0)
+CloseBtn.Text = "ปิด GUI"
+CloseBtn.TextColor3 = Color3.new(1,1,1)
+CloseBtn.TextScaled = true
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.Parent = MainFrame
+
+CloseBtn.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+-- ================== ระบบฟาร์ม (จากสคริปต์เดิม) ==================
+spawn(function()
+    while true do
+        if _G.AutoFarm then
+            pcall(function()
+                -- Auto ATM
+                if _G.AutoATM then
+                    for _, v in ipairs(workspace:GetDescendants()) do
+                        if v.Name:lower():find("atm") or v.Name:lower():find("teller") then
+                            local remote = rs:FindFirstChild("ATMEvent", true) or rs.Remotes:FindFirstChild("ATMEvent")
+                            if remote then
+                                remote:FireServer("Hack", v)
+                            end
+                        end
+                    end
+                end
+
+                -- Auto Plant
+                if _G.AutoPlant then
+                    local plots = workspace:FindFirstChild("Houses") or workspace:FindFirstChild("Plots") or workspace
+                    for _, plot in ipairs(plots:GetDescendants()) do
+                        if plot:FindFirstChild("Soil") and not plot:FindFirstChild("Plant") and not plot:FindFirstChild("Tree") then
+                            local remote = rs.Remotes:FindFirstChild("PlantSeed") or rs:FindFirstChild("PlantSeed", true)
+                            if remote then
+                                remote:FireServer("Sunflower", plot)
+                            end
+                        end
+                    end
+                end
+
+                -- Auto Harvest
+                if _G.AutoHarvest then
+                    for _, plant in ipairs(workspace:GetDescendants()) do
+                        if plant.Name:lower():find("sunflower") or plant.Name:lower():find("tree") or plant.Name:lower():find("plant") then
+                            local prompt = plant:FindFirstChildWhichIsA("ProximityPrompt")
+                            if prompt then
+                                fireproximityprompt(prompt)
+                            end
+                        end
+                    end
+                end
+
+                -- Auto Deposit
+                if _G.AutoDeposit then
+                    local money = player:FindFirstChild("leaderstats") and player.leaderstats:FindFirstChild("Money")
+                    if money and money.Value >= _G.DepositAt then
+                        local remote = rs:FindFirstChild("ATMEvent", true) or rs.Remotes:FindFirstChild("ATMEvent")
+                        if remote then
+                            remote:FireServer({Action = "Deposit", Amount = "All"})
+                        end
+                    end
+                end
+            end)
+        end
+        task.wait(1.7)
+    end
+end)
+
+print("✅ GUI + Auto Farm โหลดสำเร็จแล้ว! ลาก Title เพื่อย้าย")
