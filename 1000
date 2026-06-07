@@ -1,0 +1,88 @@
+-- Block Spin Auto Farm (Fixed 2026)
+-- วางแล้ว Execute
+
+local player = game.Players.LocalPlayer
+local rs = game:GetService("ReplicatedStorage")
+
+_G.AutoFarm = true
+_G.AutoATM = true
+_G.AutoPlant = true
+_G.AutoHarvest = true
+_G.AutoDeposit = true
+_G.DepositAt = 15000
+
+print("🚀 Block Spin Auto Farm (Fixed) เริ่มทำงาน")
+
+-- ================== AUTO ATM ==================
+spawn(function()
+    while _G.AutoFarm and _G.AutoATM do
+        pcall(function()
+            for _, v in ipairs(workspace:GetDescendants()) do
+                if v.Name:lower():find("atm") or v.Name:lower():find("teller") then
+                    local remote = rs:FindFirstChild("ATMEvent", true) or rs.Remotes:FindFirstChild("ATMEvent")
+                    if remote then
+                        remote:FireServer("Hack", v)
+                    end
+                    task.wait(1.2)
+                end
+            end
+        end)
+        task.wait(2.5)
+    end
+end)
+
+-- ================== AUTO PLANT ==================
+spawn(function()
+    while _G.AutoFarm and _G.AutoPlant do
+        pcall(function()
+            local plots = workspace:FindFirstChild("Houses") or workspace:FindFirstChild("Plots") or workspace
+            for _, plot in ipairs(plots:GetDescendants()) do
+                if plot:FindFirstChild("Soil") and not plot:FindFirstChild("Plant") and not plot:FindFirstChild("Tree") then
+                    local remote = rs.Remotes:FindFirstChild("PlantSeed") or rs:FindFirstChild("PlantSeed", true)
+                    if remote then
+                        remote:FireServer("Sunflower", plot)  -- เปลี่ยนเป็น "OrganicTree" ได้
+                    end
+                    task.wait(0.6)
+                end
+            end
+        end)
+        task.wait(3)
+    end
+end)
+
+-- ================== AUTO HARVEST ==================
+spawn(function()
+    while _G.AutoFarm and _G.AutoHarvest do
+        pcall(function()
+            for _, plant in ipairs(workspace:GetDescendants()) do
+                if plant.Name:lower():find("sunflower") or plant.Name:lower():find("tree") or plant.Name:lower():find("plant") then
+                    local prompt = plant:FindFirstChildWhichIsA("ProximityPrompt")
+                    if prompt then
+                        fireproximityprompt(prompt)
+                        task.wait(0.4)
+                    end
+                end
+            end
+        end)
+        task.wait(1.8)
+    end
+end)
+
+-- ================== AUTO DEPOSIT ==================
+spawn(function()
+    while _G.AutoFarm and _G.AutoDeposit do
+        pcall(function()
+            local money = player:FindFirstChild("leaderstats") and player.leaderstats:FindFirstChild("Money")
+            if money and money.Value >= _G.DepositAt then
+                local remote = rs:FindFirstChild("ATMEvent", true) or rs.Remotes:FindFirstChild("ATMEvent")
+                if remote then
+                    remote:FireServer({Action = "Deposit", Amount = "All"})
+                    print("💰 ฝากเงินสำเร็จ: " .. money.Value)
+                end
+            end
+        end)
+        task.wait(5)
+    end
+end)
+
+print("✅ สคริปต์โหลดเสร็จแล้ว! ถ้ายังไม่ทำงานให้บอก Error ที่ขึ้นมา")
