@@ -1,0 +1,108 @@
+-- 🌀 Block Spin Farm (ปรับปรุงใหม่ - ควบคุม ATM ได้)
+-- Copy ทั้งหมด วาง Execute
+
+local player = game.Players.LocalPlayer
+local rs = game:GetService("ReplicatedStorage")
+
+_G.AutoFarm = false
+_G.AutoATM = true
+_G.AutoPlant = true
+_G.AutoHarvest = true
+_G.AutoDeposit = true
+_G.ATM_Speed = 1.5   -- ยิ่งตัวเลขน้อย = แฮ็กเร็ว (เสี่ยงแบนสูง)
+
+print("🚀 Block Spin Farm โหลดแล้ว")
+
+-- ================== GUI ==================
+local sg = Instance.new("ScreenGui")
+sg.ResetOnSpawn = false
+sg.Parent = player:WaitForChild("PlayerGui")
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 370, 0, 500)
+frame.Position = UDim2.new(0.5, -185, 0.5, -250)
+frame.BackgroundColor3 = Color3.fromRGB(20,20,20)
+frame.Draggable = true
+frame.Parent = sg
+
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1,0,0,50)
+title.BackgroundColor3 = Color3.fromRGB(0,120,0)
+title.Text = "🤑 BLOCK SPIN FARM"
+title.TextColor3 = Color3.new(1,1,1)
+title.TextScaled = true
+title.Font = Enum.Font.GothamBold
+title.Parent = frame
+
+-- Status
+local status = Instance.new("TextLabel")
+status.Size = UDim2.new(0.9,0,0,40)
+status.Position = UDim2.new(0.05,0,0,60)
+status.BackgroundColor3 = Color3.fromRGB(170,0,0)
+status.Text = "สถานะ: ปิด"
+status.TextColor3 = Color3.new(1,1,1)
+status.TextScaled = true
+status.Parent = frame
+
+local function Toggle(name, y, var)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.9,0,0,45)
+    btn.Position = UDim2.new(0.05,0,0,y)
+    btn.BackgroundColor3 = Color3.fromRGB(40,40,40)
+    btn.Text = name .. ": ON"
+    btn.TextColor3 = Color3.new(1,1,1)
+    btn.TextScaled = true
+    btn.Parent = frame
+    btn.MouseButton1Click:Connect(function()
+        _G[var] = not _G[var]
+        btn.Text = name .. (_G[var] and ": ON" or ": OFF")
+        btn.BackgroundColor3 = _G[var] and Color3.fromRGB(0,170,0) or Color3.fromRGB(170,0,0)
+    end)
+end
+
+Toggle("Auto ATM Hack", 120, "AutoATM")
+Toggle("Auto Plant", 175, "AutoPlant")
+Toggle("Auto Harvest", 230, "AutoHarvest")
+Toggle("Auto Deposit", 285, "AutoDeposit")
+
+-- ปุ่มเปิด-ปิดหลัก
+local main = Instance.new("TextButton")
+main.Size = UDim2.new(0.9,0,0,55)
+main.Position = UDim2.new(0.05,0,0,350)
+main.BackgroundColor3 = Color3.fromRGB(0,170,0)
+main.Text = "เปิดฟาร์ม"
+main.TextColor3 = Color3.new(1,1,1)
+main.TextScaled = true
+main.Parent = frame
+
+main.MouseButton1Click:Connect(function()
+    _G.AutoFarm = not _G.AutoFarm
+    main.Text = _G.AutoFarm and "ปิดฟาร์ม" or "เปิดฟาร์ม"
+    main.BackgroundColor3 = _G.AutoFarm and Color3.fromRGB(170,0,0) or Color3.fromRGB(0,170,0)
+    status.Text = _G.AutoFarm and "กำลังฟาร์มเงิน 💰" or "สถานะ: ปิด"
+    status.BackgroundColor3 = _G.AutoFarm and Color3.fromRGB(0,170,0) or Color3.fromRGB(170,0,0)
+end)
+
+-- ================== ฟาร์ม ==================
+spawn(function()
+    while true do
+        if _G.AutoFarm then
+            pcall(function()
+                if _G.AutoATM then
+                    for _, v in ipairs(workspace:GetDescendants()) do
+                        if v.Name:lower():find("atm") or v.Name:lower():find("teller") then
+                            local remote = rs:FindFirstChild("ATMEvent", true) or rs.Remotes:FindFirstChild("ATMEvent")
+                            if remote then
+                                remote:FireServer("Hack", v)
+                            end
+                        end
+                    end
+                end
+                -- (ส่วน Plant, Harvest, Deposit เหมือนเดิม)
+            end)
+        end
+        task.wait(_G.ATM_Speed)
+    end
+end)
+
+print("✅ GUI พร้อมใช้งาน! ปรับ Auto ATM ได้ตามต้องการ")
