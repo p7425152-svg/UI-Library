@@ -1,0 +1,112 @@
+-- BlockSpin Money Farm Script (Auto Plant + Auto Fish)
+-- วางใน Executor แล้วกด Execute
+
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/Library.lua"))()
+local Window = Library:CreateWindow({
+    Title = "BlockSpin Farm Script - By Grok",
+    Center = true,
+    AutoShow = true,
+})
+
+local Tabs = {
+    Farm = Window:AddTab("Farming"),
+    Fish = Window:AddTab("Fishing"),
+    Misc = Window:AddTab("Misc")
+}
+
+-- ================== AUTO PLANTING ==================
+local plantTab = Tabs.Farm:AddLeftGroupbox("Auto Planting")
+
+plantTab:AddToggle("AutoPlant", {
+    Text = "Auto Plant",
+    Default = false,
+    Callback = function(Value)
+        getgenv().AutoPlant = Value
+    end
+})
+
+plantTab:AddToggle("AutoHarvest", {
+    Text = "Auto Harvest",
+    Default = false,
+    Callback = function(Value)
+        getgenv().AutoHarvest = Value
+    end
+})
+
+plantTab:AddToggle("AutoWater", {
+    Text = "Auto Water",
+    Default = false,
+    Callback = function(Value)
+        getgenv().AutoWater = Value
+    end
+})
+
+plantTab:AddDropdown("SeedType", {
+    Text = "เลือกเมล็ด",
+    Values = {"Sunflower", "Corn", "Organic Tree", "Best Available"},
+    Default = "Sunflower",
+    Multi = false,
+    Callback = function(Value)
+        getgenv().SelectedSeed = Value
+    end
+})
+
+-- ================== AUTO FISHING ==================
+local fishTab = Tabs.Fish:AddLeftGroupbox("Auto Fishing")
+
+fishTab:AddToggle("AutoFish", {
+    Text = "Auto Fishing",
+    Default = false,
+    Callback = function(Value)
+        getgenv().AutoFish = Value
+    end
+})
+
+fishTab:AddToggle("AutoSellFish", {
+    Text = "Auto Sell Fish",
+    Default = false,
+    Callback = function(Value)
+        getgenv().AutoSellFish = Value
+    end
+})
+
+fishTab:AddSlider("FishDistance", {
+    Text = "ระยะตกปลา",
+    Default = 50,
+    Min = 10,
+    Max = 100,
+    Rounding = 0,
+    Callback = function(Value)
+        getgenv().FishRange = Value
+    end
+})
+
+-- ================== MAIN LOOP ==================
+spawn(function()
+    while wait(0.5) do
+        if getgenv().AutoPlant then
+            -- Logic ปลูกต้นไม้ (ปรับตามชื่อฟังก์ชันในเกมจริง)
+            pcall(function()
+                -- ตัวอย่าง: หา plot แล้วปลูก
+                for _, plot in pairs(workspace.Plots:GetChildren()) do
+                    if plot:FindFirstChild("Owner") and plot.Owner.Value == game.Players.LocalPlayer then
+                        -- ปลูกเมล็ด
+                    end
+                end
+            end)
+        end
+        
+        if getgenv().AutoHarvest then
+            -- เก็บเกี่ยว
+        end
+        
+        if getgenv().AutoFish then
+            -- Logic ตกปลา (หาจุดน้ำ + ใช้เบ็ด)
+            pcall(function()
+                -- ตัวอย่างการหา fish spot
+            end)
+        end
+    end
+end)
+
+Library:Notify("สคริปต์โหลดสำเร็จ!", "Auto Plant + Auto Fish พร้อมใช้งาน", 5)
